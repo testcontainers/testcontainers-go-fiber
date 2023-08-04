@@ -2,8 +2,11 @@ package main
 
 import (
 	"context"
+	"fmt"
 	"log"
 	"os"
+	"os/signal"
+	"syscall"
 
 	"github.com/gofiber/fiber/v2"
 )
@@ -35,6 +38,37 @@ var App *MyApp = &MyApp{
 
 func main() {
 	app := fiber.New()
+
+	// helper function to stop the dependencies
+	shutdownFn := func() error {
+		ctx := context.Background()
+		for _, dep := range App.DevDependencies {
+			err := dep.Terminate(ctx)
+			if err != nil {
+				log.Println("Error terminating the backend dependency:", err)
+				return err
+			}
+		}
+
+		return nil
+	}
+
+	// register the shutdown function
+	app.Hooks().OnShutdown(shutdownFn)
+
+	var gracefulStop = make(chan os.Signal)
+	signal.Notify(gracefulStop, syscall.SIGTERM)
+	signal.Notify(gracefulStop, syscall.SIGINT)
+	go func() {
+		// also use the shutdown function when the SIGTERM or SIGINT signals are received
+		sig := <-gracefulStop
+		fmt.Printf("caught sig: %+v\n", sig)
+		err := shutdownFn()
+		if err != nil {
+			os.Exit(1)
+		}
+		os.Exit(0)
+	}()
 
 	app.Get("/", func(c *fiber.Ctx) error {
 		return c.SendString("Hello, World!")
