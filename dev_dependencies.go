@@ -69,9 +69,9 @@ func init() {
 }
 
 // helper function to stop the dependencies
-func shutdownDependencies(cs ...testcontainers.Container) error {
+func shutdownDependencies(containers ...testcontainers.Container) error {
 	ctx := context.Background()
-	for _, c := range cs {
+	for _, c := range containers {
 		err := c.Terminate(ctx)
 		if err != nil {
 			log.Println("Error terminating the backend dependency:", err)
