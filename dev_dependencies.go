@@ -5,8 +5,12 @@ package main
 
 import (
 	"context"
+	"fmt"
 	"log"
+	"os"
+	"os/signal"
 	"path/filepath"
+	"syscall"
 	"time"
 
 	"github.com/jackc/pgx/v5"
@@ -49,4 +53,34 @@ func init() {
 
 	App.UsersConnection = connStr
 	log.Println("Users database started successfully")
+
+	// register a graceful shutdown to stop the dependencies when the application is stopped
+	// only in development mode
+	var gracefulStop = make(chan os.Signal)
+	signal.Notify(gracefulStop, syscall.SIGTERM)
+	signal.Notify(gracefulStop, syscall.SIGINT)
+	go func() {
+		// also use the shutdown function when the SIGTERM or SIGINT signals are received
+		sig := <-gracefulStop
+		fmt.Printf("caught sig: %+v\n", sig)
+		err := shutdownDependencies(c)
+		if err != nil {
+			os.Exit(1)
+		}
+		os.Exit(0)
+	}()
+}
+
+// helper function to stop the dependencies
+func shutdownDependencies(cs ...testcontainers.Container) error {
+	ctx := context.Background()
+	for _, c := range cs {
+		err := c.Terminate(ctx)
+		if err != nil {
+			log.Println("Error terminating the backend dependency:", err)
+			return err
+		}
+	}
+
+	return nil
 }
