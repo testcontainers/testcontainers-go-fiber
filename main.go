@@ -32,5 +32,8 @@ func main() {
 		return c.SendString("Hello, World!")
 	})
 
+	// register the fiber app
+	App.FiberApp = app
+
 	log.Fatal(app.Listen(":8000"))
 }
