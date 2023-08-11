@@ -1,19 +1,11 @@
 package main
 
 import (
-	"context"
 	"log"
 	"os"
 
 	"github.com/gofiber/fiber/v2"
 )
-
-type DevDependency interface {
-	Terminate(ctx context.Context) error
-}
-
-// The dependencies for development mode
-var DevDependencies []DevDependency = []DevDependency{}
 
 type MyApp struct {
 	// The name of the app

@@ -48,9 +48,6 @@ func init() {
 	}
 	defer conn.Close(ctx)
 
-	// append the containers as a dev dependency
-	DevDependencies = append(DevDependencies, c)
-
 	App.UsersConnection = connStr
 	log.Println("Users database started successfully")
 
