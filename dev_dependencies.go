@@ -48,7 +48,8 @@ func init() {
 	}
 	defer conn.Close(ctx)
 
-	App.UsersConnection = connStr
+	//App.UsersConnection = connStr
+	os.Setenv("DB_CONNECTION", connStr)
 	log.Println("Users database started successfully")
 
 	// register a graceful shutdown to stop the dependencies when the application is stopped
@@ -78,6 +79,5 @@ func shutdownDependencies(containers ...testcontainers.Container) error {
 			return err
 		}
 	}
-
 	return nil
 }
