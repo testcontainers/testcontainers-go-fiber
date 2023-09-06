@@ -1,7 +1,6 @@
 package main
 
 import (
-	"fmt"
 	"github.com/gofiber/fiber/v2"
 	"github.com/testcontainers/testcontainers-go-fiber/db"
 	"log"
@@ -9,7 +8,7 @@ import (
 )
 
 func main() {
-	connStr := fmt.Sprintf(os.Getenv("DB_CONNECTION"))
+	connStr := os.Getenv("DB_CONNECTION")
 
 	conn := db.GetDb(connStr)
 	repo := db.NewUserRepo(conn)
