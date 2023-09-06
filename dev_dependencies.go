@@ -23,7 +23,7 @@ func init() {
 	ctx := context.Background()
 
 	c, err := postgres.RunContainer(ctx,
-		testcontainers.WithImage("postgres:15.3-alpine"),
+		testcontainers.WithImage("postgres:15.4-alpine"),
 		postgres.WithInitScripts(filepath.Join(".", "testdata", "dev-db.sql")),
 		postgres.WithDatabase("users-db"),
 		postgres.WithUsername("postgres"),
@@ -48,9 +48,8 @@ func init() {
 	}
 	defer conn.Close(ctx)
 
-	//App.UsersConnection = connStr
 	os.Setenv("DB_CONNECTION", connStr)
-	log.Println("Users database started successfully")
+	log.Println("Postgres database started successfully")
 
 	// register a graceful shutdown to stop the dependencies when the application is stopped
 	// only in development mode
